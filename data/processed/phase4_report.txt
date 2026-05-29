@@ -1,0 +1,115 @@
+================================================================================
+  Phase 4: 评分卡模型构建 — 完整报告
+================================================================================
+
+训练时间: 2026-05-29 16:43
+模型版本: v1.0
+
+## 1. 评分卡参数
+
+  Base Score:  600
+  PDO:         20
+  Base Odds:   5
+  Factor:      28.8539
+  Offset:      553.5614
+  Intercept:   -1.588983
+  Base Points: 599.41
+
+## 2. 模型性能
+
+  Train AUC: 0.7999
+  Test  AUC: 0.7939
+  Train KS:  0.4476
+  Test  KS:  0.4429
+  Min KS required: 0.25
+
+## 3. 特征系数
+
+  delinq_2yrs_woe                coef=-1.296291  |coef|=1.2963
+  revol_util_woe                 coef=-1.240888  |coef|=1.2409
+  annual_inc_woe                 coef=-1.221066  |coef|=1.2211
+  credit_age_woe                 coef=-1.210793  |coef|=1.2108
+  dti_woe                        coef=-1.206351  |coef|=1.2064
+  inq_6m_woe                     coef=-1.199178  |coef|=1.1992
+  fico_score_woe                 coef=-1.128265  |coef|=1.1283
+
+## 4. 分箱详情
+
+  [fico_score]
+    Boundaries: [666.0, 684.0, 700.0, 715.0, 733.0]
+    Bin_0: WOE=-1.0093
+    Bin_1: WOE=-0.4022
+    Bin_2: WOE=0.0080
+    Bin_3: WOE=0.4063
+    Bin_4: WOE=0.7981
+    Bin_5: WOE=1.4789
+
+  [inq_6m]
+    Boundaries: [1.0, 2.0]
+    Bin_0: WOE=0.3235
+    Bin_1: WOE=-0.1142
+    Bin_2: WOE=-0.3817
+    Bin_3: WOE=-0.9035
+
+  [dti]
+    Boundaries: [5.0, 7.77, 10.54, 13.66, 17.88]
+    Bin_0: WOE=0.5745
+    Bin_1: WOE=0.2519
+    Bin_2: WOE=0.2266
+    Bin_3: WOE=0.0138
+    Bin_4: WOE=-0.2026
+    Bin_5: WOE=-0.5952
+
+  [revol_util]
+    Boundaries: [21.1, 29.2, 36.5, 44.2, 54.08]
+    Bin_0: WOE=0.4955
+    Bin_1: WOE=0.2371
+    Bin_2: WOE=0.1423
+    Bin_3: WOE=-0.0111
+    Bin_4: WOE=-0.1890
+    Bin_5: WOE=-0.4855
+
+  [delinq_2yrs]
+    Boundaries: []
+    Bin_0: WOE=0.1060
+    Bin_1: WOE=-0.8160
+
+  [credit_age]
+    Boundaries: [5.7, 8.7, 11.5, 14.6, 18.4]
+    Bin_0: WOE=-0.3697
+    Bin_1: WOE=-0.2050
+    Bin_2: WOE=-0.0367
+    Bin_3: WOE=0.0935
+    Bin_4: WOE=0.2246
+    Bin_5: WOE=0.4422
+
+  [annual_inc]
+    Boundaries: [27429.0, 37848.33, 49130.0, 63510.67, 88040.0]
+    Bin_0: WOE=-0.2693
+    Bin_1: WOE=-0.1445
+    Bin_2: WOE=-0.1154
+    Bin_3: WOE=0.0138
+    Bin_4: WOE=0.1579
+    Bin_5: WOE=0.4706
+
+## 5. 风险等级
+
+  A: 680-1000  极低风险  Expected DR=5%
+  B: 640-680  低风险  Expected DR=8%
+  C: 600-640  中等风险  Expected DR=12%
+  D: 560-600  较高风险  Expected DR=18%
+  E: 300-560  高风险  Expected DR=30%
+
+## 6. 面试要点
+
+Q: 评分卡的分数怎么算出来的?
+A: 逻辑回归输出log(odds) → 通过PDO/Base Score做线性变换
+   600分基准，每20分odds翻倍。Factor=PDO/ln(2)≈28.85
+
+Q: 为什么用逻辑回归而不是XGBoost?
+A: 1)监管要求可解释性 2)WOE已线性化特征 3)评分卡转换需要系数
+   4)监管报备时需要完整的评分卡表(每个bin几分)
+
+Q: KS和AUC有什么区别?
+A: AUC衡量整体排序能力，KS衡量最优区分点的区分度
+   KS = max(|TPR - FPR|)，风控中KS>0.25基本可用
