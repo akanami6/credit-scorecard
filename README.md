@@ -93,7 +93,7 @@ credit-scorecard/
 
 ### 在线演示 (Streamlit Cloud)
 
-点击即可体验评分功能：**[Live Demo](https://YOUR-APP-NAME.streamlit.app)** *(部署后更新链接)*
+点击即可体验评分功能：**[Live Demo](https://credit-scorecard-mtpzoyfmnxfpchbuk9mu4q.streamlit.app)**
 
 ### 本地运行
 
